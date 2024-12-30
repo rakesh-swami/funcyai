@@ -88,7 +88,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - OpenAI for the AI models
 - Flask framework
 - SQLite for database management
-- All contributors and users of FuncyAI
 
 ## Support
 
