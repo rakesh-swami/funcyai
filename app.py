@@ -4,6 +4,7 @@ import sqlite3
 import json
 import logging
 import time
+import datetime
 from config import AVAILABLE_MODELS, DEFAULT_MODEL
 
 logging.basicConfig(
@@ -77,7 +78,9 @@ def execute_python_function(function_body, function_call):
     
     try:
         # Create namespace for function execution
-        namespace = {}
+        namespace = {
+            'datetime': datetime
+        }
         
         # Add common imports
         setup_code = """
@@ -92,8 +95,16 @@ import time
         # Execute function call
         result = eval(function_call, namespace)
         
-        # Convert result to JSON-serializable format
-        return json.dumps(result)
+        # Convert result to string if it's a function or other non-string type
+        if callable(result):
+            # If result is a function, get its return value by calling it
+            try:
+                result = result()
+            except:
+                result = "Function could not be executed"
+        
+        # Convert the final result to string
+        return str(result)
     except Exception as e:
         logger.error(f"Error executing Python function: {str(e)}", exc_info=True)
         return f"Error: {str(e)}"
@@ -127,6 +138,12 @@ For each function, you can see:
 Based on these examples and the user's message, determine which functions need to be called.
 You can return multiple function calls if needed, one per line.
 Return ONLY the function call(s), nothing else.
+
+Examples: 
+
+fc_get_time
+fc_get_weather
+fc_get_news
 
 User message: {message}"""
 
