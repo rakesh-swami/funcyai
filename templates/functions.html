@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FuncyAI - Function Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background-color: #ffffff;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .function-form {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+        }
+        .function-form h2 {
+            margin: 0 0 15px 0;
+            font-size: 1.2em;
+            color: #333;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 4px 0 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 0.9em;
+        }
+        textarea {
+            height: 80px;
+            font-family: monospace;
+            resize: vertical;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #10a37f;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0d8c6d;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #10a37f;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .button-group {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+        }
+        .button-group button {
+            flex: 0 1 auto;
+            padding: 6px 12px;
+            font-size: 0.85em;
+            white-space: nowrap;
+        }
+        .generate-btn {
+            background: linear-gradient(
+                120deg,
+                #4285f4 0%,
+                #ea4335 25%,
+                #fbbc05 50%,
+                #34a853 75%,
+                #4285f4 100%
+            ) !important;
+            background-size: 200% auto !important;
+            transition: all 0.3s ease !important;
+            display: flex !important;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px !important;
+        }
+        .generate-btn:hover {
+            background-position: right center !important;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .generate-btn i {
+            font-size: 0.9em;
+        }
+        #submit-btn {
+            background-color: #10a37f;
+            min-width: 100px;
+        }
+        .test-btn {
+            background-color: #6c757d;
+            min-width: 80px;
+        }
+        .cancel-btn {
+            background-color: #6c757d;
+        }
+        .cancel-btn:hover {
+            background-color: #5a6268;
+        }
+        .test-panel {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+            min-height: 40px;
+        }
+        .test-result.success {
+            border-color: #28a745;
+            color: #28a745;
+        }
+        .test-result.error {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+        .functions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+        .functions-table th,
+        .functions-table td {
+            padding: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        .functions-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            text-align: left;
+        }
+        .actions {
+            white-space: nowrap;
+            min-width: 200px;
+        }
+        .action-btn {
+            padding: 4px 8px;
+            font-size: 0.85em;
+            margin: 0 2px;
+        }
+        .code-row td {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .examples {
+            background-color: #f8f9fa;
+            padding: 8px;
+            border-radius: 4px;
+            margin: 4px 0;
+            font-size: 0.9em;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+        @keyframes text-wave {
+            0% { 
+                background-position: 0% center;
+            }
+            100% { 
+                background-position: 200% center;
+            }
+        }
+        .generating {
+            background: linear-gradient(
+                120deg,
+                #4285f4 0%,
+                #ea4335 25%,
+                #fbbc05 50%,
+                #4285f4 75%,
+                #ea4335 100%
+            ) !important;
+            background-size: 200% auto !important;
+            color: transparent !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+            animation: text-wave 3s linear infinite !important;
+        }
+        /* Add logo styles */
+        .logo {
+            margin-bottom: 10px;
+        }
+        .logo-link {
+            text-decoration: none;
+        }
+        .logo-text {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(120deg, #10a37f, #0d8c6d);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+        .logo-ai {
+            background: linear-gradient(120deg, #4285f4, #ea4335);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-style: italic;
+        }
+        .logo:hover .logo-text {
+            animation: glow 1.5s ease-in-out infinite alternate;
+        }
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px rgba(16, 163, 127, 0.3);
+            }
+            to {
+                text-shadow: 0 0 10px rgba(16, 163, 127, 0.5);
+            }
+        }
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(240, 240, 240, 0.8));
+            z-index: -1; /* Ensure it stays behind other content */
+            transition: background 0.3s ease;
+        }
+        /* Dark mode background */
+        [data-theme="dark"] .background {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8), rgba(45, 45, 45, 0.8));
+        }
+        /* Add back button styles */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #10a37f;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 10px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+        .back-button:hover {
+            background-color: rgba(16, 163, 127, 0.1);
+        }
+        /* Dark mode support */
+        [data-theme="dark"] .function-form {
+            background-color: #2d3748;
+            border-color: #4a5568;
+        }
+        [data-theme="dark"] .functions-table th {
+            background-color: #2d3748;
+        }
+        [data-theme="dark"] .examples {
+            background-color: #2d3748;
+        }
+        /* Add generating indicator styles */
+        .generating-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: 600;
+            font-size: 1.2em;
+            padding: 8px 16px;
+            border-radius: 6px;
+            pointer-events: none;
+            z-index: 10;
+            background: linear-gradient(
+                120deg,
+                #4285f4 0%,
+                #ea4335 25%,
+                #fbbc05 50%,
+                #34a853 75%,
+                #4285f4 100%
+            );
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: text-wave 3s linear infinite;
+        }
+        @keyframes text-wave {
+            0% { 
+                background-position: 0% center;
+            }
+            100% { 
+                background-position: 200% center;
+            }
+        }
+        /* Dark mode support - no need to change color in dark mode since it's gradient */
+        [data-theme="dark"] .generating-indicator {
+            background: linear-gradient(
+                120deg,
+                #4285f4 0%,
+                #ea4335 25%,
+                #fbbc05 50%,
+                #34a853 75%,
+                #4285f4 100%
+            );
+        }
+        @keyframes pulse {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+        /* Update textarea style when generating */
+        textarea.generating {
+            color: transparent !important;
+            border-color: #333 !important;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3) !important;
+            animation: border-glow 2s ease-in-out infinite !important;
+        }
+        /* Add border glow animation */
+        @keyframes border-glow {
+            0% { 
+                border-color: #333;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            }
+            50% { 
+                border-color: #666;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            }
+            100% { 
+                border-color: #333;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            }
+        }
+        /* Dark mode support */
+        [data-theme="dark"] textarea.generating {
+            border-color: #666 !important;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1) !important;
+            animation: border-glow-dark 2s ease-in-out infinite !important;
+        }
+        @keyframes border-glow-dark {
+            0% { 
+                border-color: #666;
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            }
+            50% { 
+                border-color: #888;
+                box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            }
+            100% { 
+                border-color: #666;
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            }
+        }
+        /* Update textarea position for indicator */
+        .function-form textarea {
+            position: relative;
+            height: 200px;
+            font-family: monospace;
+            resize: vertical;
+            background: transparent;
+        }
+        /* Update form labels */
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: var(--text-color);
+            font-size: 0.9em;
+        }
+        /* Update generating indicator styles */
+        .generating-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: 600;
+            font-size: 1.2em;
+            padding: 8px 16px;
+            border-radius: 6px;
+            pointer-events: none;
+            z-index: 10;
+            background: linear-gradient(
+                120deg,
+                #4285f4 0%,
+                #ea4335 25%,
+                #fbbc05 50%,
+                #34a853 75%,
+                #4285f4 100%
+            );
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: text-wave 3s linear infinite;
+        }
+        /* Update textarea container for positioning */
+        .textarea-container {
+            position: relative;
+            margin-bottom: 10px;
+        }
+        /* Dark mode support */
+        [data-theme="dark"] .form-label {
+            color: #cbd5e0;
+        }
+        /* Update h1 margin */
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 1.5em;
+        }
+        /* Make Example Questions textarea smaller */
+        #function-examples {
+            height: 40px;
+        }
+        /* Keep Function Body textarea height */
+        #function-body {
+            height: 200px;
+        }
+        /* Add modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            position: relative;
+            background-color: white; /* Force white background */
+            margin: 8% auto;
+            padding: 25px;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+            animation: modalSlideIn 0.3s ease;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .modal-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .modal-subtitle {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .function-info {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+            font-size: 0.9em;
+        }
+        .function-info strong {
+            color: #10a37f;
+        }
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #666;
+            cursor: pointer;
+            padding: 0;
+        }
+        .close-modal:hover {
+            color: #333;
+        }
+        .modal textarea {
+            width: 100%;
+            height: 120px;
+            margin-bottom: 15px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .modal-buttons button {
+            padding: 8px 16px;
+            border-radius: 6px;
+        }
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        /* Dark mode support */
+        [data-theme="dark"] .modal-content {
+            background-color: #1a1a1a;
+        }
+        [data-theme="dark"] .modal-title {
+            color: #e0e0e0;
+        }
+        [data-theme="dark"] .modal-subtitle {
+            color: #999;
+        }
+        [data-theme="dark"] .function-info {
+            background: #2d3748;
+            border-color: #4a5568;
+        }
+        [data-theme="dark"] .close-modal {
+            color: #cbd5e0;
+        }
+        [data-theme="dark"] .close-modal:hover {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="logo">
+        <a href="/" class="logo-link">
+            <span class="logo-text">Funcy<span class="logo-ai">AI</span></span>
+        </a>
+    </div>
+    <div class="container">
+        <a href="/" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+            Back to Chat
+        </a>
+        <h1>Function Management</h1>
+        
+        <div class="function-form">
+            <h2 id="form-title">Add New Function</h2>
+            <form id="function-form" action="/functions/add" method="POST">
+                <input type="hidden" id="function-id" name="id" value="">
+                <input type="hidden" id="function-prompt" name="func_prompt_used" value="">
+                
+                <label class="form-label" for="function-name">Function Name: </label>
+                <input type="text" name="name" id="function-name" placeholder="Enter function name" required>
+                
+                <label class="form-label" for="function-description">Description: </label>
+                <input type="text" name="description" id="function-description" placeholder="Describe what the function does" required>
+                
+                <label class="form-label" for="function-examples">Example Questions: </label>
+                <textarea name="examples" id="function-examples" placeholder="Enter one example question per line" required></textarea>
+                
+                <label class="form-label" for="function-body">Function Body: </label>
+                <div class="textarea-container">
+                    <textarea name="body" id="function-body" placeholder="Python code for the function. Use 'GENERATE FUNCTION' button to generate the function using AI" required></textarea>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" id="submit-btn">Add Function</button>
+                    <button type="button" onclick="generateFunction()" class="generate-btn">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        Generate Function
+                    </button>
+                    <button type="button" onclick="showNewFunctionTest()" class="test-btn">Test</button>
+                    <button type="button" onclick="resetForm()" class="cancel-btn" style="display: none;">Cancel</button>
+                </div>
+                <div id="new-function-test" class="test-panel" style="display: none;">
+                    <input type="text" id="new-function-params" placeholder="Enter function parameters">
+                    <button type="button" onclick="testNewFunction()">Run Test</button>
+                    <div id="new-function-result" class="test-result"></div>
+                </div>
+            </form>
+        </div>
+
+        <div class="function-list">
+            <h2>Existing Functions</h2>
+            <table class="functions-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Example Questions</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for function in functions %}
+                    <tr>
+                        <td>{{ function['name'] }}</td>
+                        <td>{{ function['description'] }}</td>
+                        <td><pre class="examples">{{ function['examples'] }}</pre></td>
+                        <td class="actions">
+                            <button onclick="toggleCode({{ function['id'] }})" class="action-btn">
+                                <i class="fas fa-code"></i> Toggle Code
+                            </button>
+                            <button onclick="editFunction({{ function['id'] }})" class="action-btn">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <a href="/functions/delete/{{ function['id'] }}">
+                                <button class="action-btn delete-btn">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr id="code-{{ function['id'] }}" class="code-row" style="display: none;">
+                        <td colspan="4">
+                            <pre><code>{{ function['body'] }}</code></pre>
+                            <div id="test-panel-{{ function['id'] }}" class="test-panel">
+                                <input type="text" id="test-input-{{ function['id'] }}" placeholder="Enter function parameters">
+                                <button onclick='testFunction({{ function['id'] }}, {{ function['name']|tojson|safe }}, {{ function['body']|tojson|safe }})'>Run Test</button>
+                                <div id="test-result-{{ function['id'] }}" class="test-result"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add modal HTML -->
+    <div id="generateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Generate Function with AI</h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="function-info" class="function-info">
+                Generating function: <strong id="modal-function-name"></strong>
+            </div>
+            <p class="modal-subtitle">Describe what you want the function to do. Be as specific as possible.</p>
+            <textarea id="aiPrompt" placeholder="Example: Create a function that takes a list of numbers and returns the sum of all even numbers in the list. The function should handle empty lists and invalid inputs gracefully."></textarea>
+            <div class="modal-buttons">
+                <button onclick="closeModal()" class="cancel-btn">Cancel</button>
+                <button onclick="generateFromAI()" class="generate-btn">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                    Generate
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function editFunction(id) {
+            // Fetch function data first
+            fetch(`/functions/get/${id}`)
+                .then(response => response.json())
+                .then(func => {
+                    // Populate form with function data
+                    document.getElementById('function-id').value = func.id;
+                    document.getElementById('function-name').value = func.name;
+                    document.getElementById('function-description').value = func.description;
+                    document.getElementById('function-examples').value = func.examples;
+                    document.getElementById('function-body').value = func.body;
+                    
+                    // Store the original prompt for regeneration
+                    if (func.func_prompt_used) {
+                        document.getElementById('function-prompt').value = func.func_prompt_used;
+                        document.getElementById('aiPrompt').value = func.func_prompt_used;
+                    }
+                    
+                    // Update form appearance
+                    document.getElementById('form-title').textContent = 'Edit Function';
+                    document.getElementById('submit-btn').textContent = 'Update Function';
+                    document.getElementById('function-form').action = `/functions/edit/${func.id}`;
+                    document.querySelector('.cancel-btn').style.display = 'block';
+                    
+                    // Scroll to form
+                    document.querySelector('.function-form').scrollIntoView({ behavior: 'smooth' });
+                })
+                .catch(error => {
+                    console.error('Error fetching function:', error);
+                    alert('Error loading function data');
+                });
+        }
+
+        function resetForm() {
+            // Reset form to add mode
+            document.getElementById('function-form').reset();
+            document.getElementById('function-id').value = '';
+            document.getElementById('form-title').textContent = 'Add New Function';
+            document.getElementById('submit-btn').textContent = 'Add Function';
+            document.getElementById('function-form').action = '/functions/add';
+            document.querySelector('.cancel-btn').style.display = 'none';
+        }
+
+        function generateFunction() {
+            const name = document.getElementById('function-name').value;
+            const description = document.getElementById('function-description').value;
+            const textarea = document.getElementById('function-body');
+
+            if (!name || !description) {
+                alert('Please provide both name and description');
+                return;
+            }
+
+            // Add generating indicator inside the textarea container
+            textarea.classList.add('generating');
+            const indicator = document.createElement('div');
+            indicator.className = 'generating-indicator';
+            indicator.textContent = 'Generating function...';
+            textarea.parentElement.appendChild(indicator);
+
+            fetch('/generate_function', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: name,
+                    description: description
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    textarea.value = data.function;
+                } else {
+                    alert('Error generating function: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Error generating function: ' + error);
+            })
+            .finally(() => {
+                // Remove generating indicator
+                textarea.classList.remove('generating');
+                const indicator = textarea.parentElement.querySelector('.generating-indicator');
+                if (indicator) {
+                    indicator.remove();
+                }
+            });
+        }
+
+        function showTestPanel(id) {
+            const panel = document.getElementById(`test-panel-${id}`);
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function testFunction(id, functionName, functionBody) {
+            const input = document.getElementById(`test-input-${id}`).value.trim();
+            const resultDiv = document.getElementById(`test-result-${id}`);
+            resultDiv.className = 'test-result';
+            resultDiv.textContent = 'Testing...';
+
+            try {
+                const response = await fetch('/test_function', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: functionName,
+                        body: functionBody,
+                        params: input || ''
+                    })
+                });
+
+                const data = await response.json();
+                resultDiv.textContent = data.result;
+                resultDiv.className = `test-result ${data.success ? 'success' : 'error'}`;
+            } catch (error) {
+                resultDiv.textContent = 'Error testing function: ' + error;
+                resultDiv.className = 'test-result error';
+            }
+        }
+
+        function showNewFunctionTest() {
+            const panel = document.getElementById('new-function-test');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function testNewFunction() {
+            const name = document.getElementById('function-name').value.trim();
+            const body = document.getElementById('function-body').value.trim();
+            const params = document.getElementById('new-function-params').value.trim();
+            const resultDiv = document.getElementById('new-function-result');
+
+            if (!name || !body) {
+                resultDiv.textContent = 'Please provide both function name and body';
+                resultDiv.className = 'test-result error';
+                return;
+            }
+
+            resultDiv.className = 'test-result';
+            resultDiv.textContent = 'Testing...';
+
+            try {
+                const response = await fetch('/test_function', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        body: body,
+                        params: params || ''
+                    })
+                });
+
+                const data = await response.json();
+                resultDiv.textContent = data.result;
+                resultDiv.className = `test-result ${data.success ? 'success' : 'error'}`;
+            } catch (error) {
+                resultDiv.textContent = 'Error testing function';
+                resultDiv.className = 'test-result error';
+            }
+        }
+
+        function toggleCode(id) {
+            const codeRow = document.getElementById(`code-${id}`);
+            if (codeRow.style.display === 'none') {
+                codeRow.style.display = 'table-row';
+                // Show test panel when code is shown
+                const testPanel = document.getElementById(`test-panel-${id}`);
+                if (testPanel) {
+                    testPanel.style.display = 'block';
+                }
+            } else {
+                codeRow.style.display = 'none';
+                // Hide test panel when code is hidden
+                const testPanel = document.getElementById(`test-panel-${id}`);
+                if (testPanel) {
+                    testPanel.style.display = 'none';
+                }
+            }
+        }
+
+        function showModal() {
+            const name = document.getElementById('function-name').value;
+            if (!name) {
+                alert('Please enter a function name first');
+                return;
+            }
+            
+            document.getElementById('modal-function-name').textContent = name;
+            document.getElementById('generateModal').style.display = 'block';
+            document.getElementById('aiPrompt').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('generateModal').style.display = 'none';
+        }
+
+        function generateFromAI() {
+            const prompt = document.getElementById('aiPrompt').value;
+            const name = document.getElementById('function-name').value;
+            const textarea = document.getElementById('function-body');
+            const promptInput = document.getElementById('function-prompt');
+
+            if (!prompt) {
+                alert('Please describe what you want the function to do');
+                return;
+            }
+
+            // Store the prompt in the hidden input
+            promptInput.value = prompt;
+
+            // Add generating indicator with function name
+            textarea.classList.add('generating');
+            const indicator = document.createElement('div');
+            indicator.className = 'generating-indicator';
+            indicator.textContent = `Generating function ${name}()...`;
+            textarea.parentElement.appendChild(indicator);
+
+            // Close the modal
+            closeModal();
+
+            // Include both prompt and description in the request
+            fetch('/generate_function', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: name,
+                    description: prompt,
+                    prompt: prompt
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    textarea.value = data.function;
+                    // Auto-fill description if empty
+                    const descriptionInput = document.getElementById('function-description');
+                    if (!descriptionInput.value) {
+                        descriptionInput.value = prompt.split('.')[0] + '.';
+                    }
+                } else {
+                    alert('Error generating function: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Error generating function: ' + error);
+            })
+            .finally(() => {
+                textarea.classList.remove('generating');
+                const indicator = textarea.parentElement.querySelector('.generating-indicator');
+                if (indicator) {
+                    indicator.remove();
+                }
+            });
+        }
+
+        // Update the onclick handler for the Generate Function button
+        document.querySelector('.generate-btn').onclick = showModal;
+    </script>
+</body>
+</html> 
