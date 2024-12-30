@@ -1,5 +1,5 @@
 # funcyai
-A wrapper over OpenLLM Models that makes them func-ky
+A wrapper over OpenLLM Models like Qwen/Llama that makes them do func-ky suff!
 
 
 
