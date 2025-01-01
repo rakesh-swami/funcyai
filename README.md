@@ -105,14 +105,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Acknowledgments
 
-- OpenAI for the AI models
+- Ollama for the AI models
 - Flask framework
 - SQLite for database management
-
-## Support
-
-For support, please open an issue in the GitHub repository or contact the maintainers.
-
----
-
-Made with ❤️ using Python and AI
