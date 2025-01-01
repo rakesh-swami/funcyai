@@ -3,17 +3,20 @@ A wrapper over OpenLLM Models like Qwen/Llama that makes them do func-ky suff!
 
 Prologue: If you run a base OpenSource LLM Model, it has General Knowledge, but cannot answer simple questions like "What is the date today?" as it 
 
- - has a knowldege upto a traning cut-of-date.
+ - has knowldege upto a traning cut-of-date.
  - does not have access to internet to have information to answer such questions.
 
 This PoC attempts to provide LLM API with information at runtime by defining fuctions that it can access by understanding the context of the user request.
 
 Demo:
 
+1: Base model unable to answer "What is the date today?"
 ![Demo-1](https://github.com/user-attachments/assets/745558b3-f2b4-4e1b-8ce4-8287138a609b)
 
+2: We create a function that can get system date
 ![Demo-2](https://github.com/user-attachments/assets/26136e97-7a4a-44a8-9fa3-d9566d6beade)
 
+3: Now the model can access this fuction and answer such questions 
 ![Demo-3](https://github.com/user-attachments/assets/7f1f82c5-fe6d-4db5-afd7-56259de19314)
 
 
