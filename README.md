@@ -1,6 +1,8 @@
 # funcyai
 A wrapper over OpenLLM Models like Qwen/Llama that makes them do func-ky suff!
 
+Note: Just a POC and may not fuction as a product. Make sure to download Ollma and Qwen2.5:3b model before using the app.
+
 Prologue: If you run a base OpenSource LLM Model, it has General Knowledge, but cannot answer simple questions like "What is the date today?" as it 
 
  - has knowldege upto a traning cut-of-date.
