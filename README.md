@@ -1,7 +1,7 @@
 # funcyai
-A wrapper over OpenLLM Models like Qwen/Llama that makes them do func-ky suff!
+A wrapper over OpenLLM Models like Qwen/LLaMA that makes them do func-ky stuff!
 
-Note: Just a POC and may not fuction as a product. Make sure to download Ollma and Qwen2.5:3b model before using the app.
+Note: Just a POC and may not fuction as a product. Make sure to download Ollama and Qwen2.5:3b model before using the app.
 
 Prologue: If you run a base OpenSource LLM Model, it has General Knowledge, but cannot answer simple questions like "What is the date today?" as it 
 
@@ -18,11 +18,17 @@ Demo:
 2: We create a function that can get system date
 ![Demo-2](https://github.com/user-attachments/assets/26136e97-7a4a-44a8-9fa3-d9566d6beade)
 
-3: Now the model can access this fuction and answer such questions 
+3: Now the model can access this fuction and answer questions around dates
 ![Demo-3](https://github.com/user-attachments/assets/7f1f82c5-fe6d-4db5-afd7-56259de19314)
 
 
+The above example should have already provided you with ideas of the potential it has, a few simple examples.
 
+ - Get Weather details.
+ - Get Latest news.
+ - Manage reminders.
+ - Search the internet.
+ - Query databases.
 
 
 
